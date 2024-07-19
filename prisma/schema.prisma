@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  username String @unique
+  role     String @default("user")
+}
+
+model Product {
+  id             Int      @id @default(autoincrement())
+  name           String
+  price          Float
+  ratingRate     Float
+  ratingQuantity Int
+  description    String
+  content        String[]
+  warranty       String
+  weight         String
+  categoryId     Int
+  category       Category @relation(fields: [categoryId], references: [id])
+
+  imagesByColor         ProductImageByColor[]
+  images                ProductImage[]
+  technicalDetails      TechnicalDetail[]
+  specifications        Specification[]
+  categoryFiltersOption ProductCategoryFilterOption[]
+}
+
+model ProductImageByColor {
+  id        Int     @id @default(autoincrement())
+  color     String
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  color     String
+  urls      String[]
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model TechnicalDetail {
+  id        Int     @id @default(autoincrement())
+  key       String
+  value     String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Specification {
+  id        Int     @id @default(autoincrement())
+  key       String
+  value     String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductCategoryFilterOption {
+  id        Int     @id @default(autoincrement())
+  key       String
+  value     Json
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id       Int              @id @default(autoincrement())
+  name     String
+  filters  CategoryFilter[]
+  products Product[]
+}
+
+model CategoryFilter {
+  id         Int      @id @default(autoincrement())
+  key        String
+  value      String
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
